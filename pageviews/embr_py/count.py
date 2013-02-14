@@ -1,77 +1,84 @@
-import argparse
+import sys
 import csv
 import logging
 import pprint
 from operator import itemgetter
+from collections import Counter
+from subprocess import Popen, PIPE
+import multiprocessing
+import itertools
+from squidrow import SquidRow
+import logging
 
-from squid.mapreduce import count_files
-from squid import SquidArgumentParser
+logger = logging.getLogger(__name__)
 
-# this change made from local machine
-
-DEFAULT_PROVIDERS = ['zero-digi-malaysia',
-                     'zero-grameenphone-bangladesh',
-                     'zero-orange-kenya',
-                     'zero-orange-niger',
-                     'zero-orange-tunesia',
-                     'zero-orange-uganda',
-                     'zero-orange-cameroon',
-                     'zero-orange-ivory-coast',
-                     'zero-telenor-montenegro',
-                     'zero-tata-india',
-                     'zero-saudi-telecom',
-                     'zero-dtac-thailand']
-
-
-def parse_args():
-
-    parser = SquidArgumentParser(description='Process a collection of squid logs and write certain extracted metrics to file')
-    parser.add_argument('providers', 
-                        metavar='PROVIDER_IDENTIFIER',
-                        nargs='*',
-                        default=DEFAULT_PROVIDERS,
-                        help='list of provider identifiers used in squid log file names')
-    parser.add_argument('--name_format',
-                        dest='name_format',
-                        type=str,
-                        default='%s.log-%.gz',
-                        help='a printf style format string which is formatted with the tuple: (provider_name, date_representation')
-    parser.set_defaults(datadir='/a/squid/archive/zero')
+def count_file(fname):
+    counter = Counter()
+    f = Popen(['zcat', fname], stdout=PIPE)
+    for i, line in enumerate(f.stdout):
+        try:
+            if i > LIMIT:
+                break
+            if i % 10000 == 0:
+                logger.info('processing %d lines of file %s', i, fname)
+            row = SquidRow(line)
+            failed = False
+            for criterion in CRITERIA:
+                if not criterion(row):
+                    failed = True
+                    break
+            if not failed:
+                counter[tuple([row[field] for field in FIELDS])] += COUNT_EVENT
+        except:
+            logger.exception('exception found while processing line: %s', line)
+            counter[(None,)*len(FIELDS)] += COUNT_EVENT
+    return counter 
 
 
-    args = parser.parse_args()
-    # custom logic for which files to grab
-    prov_files = {}
-    for prov in args.providers:
-        args.basename = prov
-        logging.info('args prior to ge_files: %s', pprint.pformat(args.__dict__))
-        prov_files[prov] = SquidArgumentParser.get_files(args)
-    setattr(args, 'squid_files', prov_files)
+def count_files(files, fields, criteria=[lambda r:r['old_init_request']], count_event=1, limit=()):
+    """
+    Uses zcat to avoid slownss of gzip module
+    Arguments:
+        -f (str)            : gzipped filename
+        -fields (list(str)) : list of fields to extract from each row
+        -criteria           : list of predicate functions to be applied to each line
+        -count_event (int)  : inverse sampling rate; i.e. how much to increment counter each time a page
+                              satisfies all of the criteria
+        -limit              : number of lines IN EACH FILE to process before exiting
+    """
+    global FIELDS, CRITERIA, COUNT_EVENT, LIMIT
+    FIELDS = fields
+    CRITERIA = criteria
+    COUNT_EVENT = count_event
+    LIMIT = limit 
+    pool = multiprocessing.Pool(min(len(files), 20))
+    counters = pool.map(count_file, files)
+    merged_counter = reduce(Counter.__or__, counters, Counter())
+    return merged_counter
 
-    
-    logging.info(pprint.pformat(args.__dict__))
-    return args
 
 def main():
-    args = parse_args()
+    if len(sys.argv) < 2:
+        print 'usage: count_mr.py SQUID_FILE ... [SQUID_FILE]'
+        sys.exit(0)
+    files = sys.argv[1:]
+    logging.info('processing files:\n%s', pprint.pformat(files))
 
     keepers = ['date', 'project', 'language', 'site']
 
     criteria = [
-            lambda r : r['datetime'] > args.start,
-            lambda r : r['datetime'] < args.end,
             lambda r : r['old_init_request']
     ]
 
-    for prov in args.providers:
-        counts = count_files(args.squid_files[prov], keepers, criteria, count_event=10)
-        rows = [fields + (count,) for fields,count in counts.items()]
-        rows = [map(str,row) for row in rows]
-        rows.sort(key=itemgetter(*range(len(keepers))))
-        with open('%s.counts.csv' % prov, 'w') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(keepers + ['count',])
-            writer.writerows(rows)
+    counts = count_files(sys.argv[1:], keepers, criteria, count_event=10)
+    rows = [fields + (count,) for fields,count in counts.items()]
+    rows = [map(str,row) for row in rows]
+    rows.sort(key=itemgetter(*range(len(keepers))))
+     
+    with open('counts.csv' , 'w') as csvfile:
+        writer = csv.writer(sys.stdout)
+        writer.writerow(keepers + ['count',])
+        writer.writerows(rows)
 
 if __name__ == '__main__':
     main()
