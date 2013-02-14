@@ -37,7 +37,7 @@ digraph G {
 
 
    Squid_log_line       -> decision_url
-   decision_url -> decision_url   [ label="yes" ];
+   decision_url -> decision_proj   [ label="yes" ];
    decision_url -> discard           [ label="no" ];
    decision_proj -> Actual_pageview   [ label="yes" ];
    decision_proj -> discard           [ label="no" ];
