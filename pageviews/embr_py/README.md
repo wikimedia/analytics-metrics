@@ -14,3 +14,9 @@ which currently prints to stdout a csv of the following format:
 # date, project, language, site, count
 2012-12-31,wikipedia,ar,X,10
 ````
+
+## Methodolody
+
+this script does the bare minium in terms of filtering: only checking whether the url path begins with '/wiki', which corresponds to the flow chart below:
+
+![Flow chart](username.github.com/embr/metrics/pageviews/embr_py/Pageview_definition.png)
