@@ -30,22 +30,13 @@ digraph G {
     >];
 
    Squid_log_line       [label="Get a squid log line",style=filled,color="CornflowerBlue" ];
-   decision_status_code [label="status code is 30x/20x ?",style=filled,color="Gold"];
-   decision_mimetype    [label="mimetype is \"-\" or \"text/html\"",style=filled,color="Gold"];
-   decision_no_bots     [label="ip isn't in bot ranges and UA doesn't contain\n \"bot\" or \"crawler\" or \"google\" ?",style=filled,color="Gold"];
+   decision_url         [label="url path begins with '/wiki' ?",style=filled,color="Gold"];
    discard              [label="entry is discarded",style=filled,color="Red"];
    Actual_pageview      [label="We have a pageview",style=filled,color="Green"];
 
 
-   Squid_log_line       -> decision_status_code
-   decision_status_code -> decision_mimetype [ label="yes" ];
-   decision_status_code -> discard           [ label="no" ];
-
-   decision_mimetype    -> decision_no_bots  [label="yes"];
-   decision_mimetype    -> discard           [label="no"];
-
-   decision_no_bots     -> Actual_pageview   [label="yes"];
-   decision_no_bots     -> discard           [label="no"];
-
+   Squid_log_line       -> decision_url
+   decision_url -> Actual_pageview   [ label="yes" ];
+   decision_url -> discard           [ label="no" ];
 
 };
