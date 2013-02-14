@@ -31,12 +31,15 @@ digraph G {
 
    Squid_log_line       [label="Get a squid log line",style=filled,color="CornflowerBlue" ];
    decision_url         [label="url path begins with '/wiki' ?",style=filled,color="Gold"];
+   decision_proj         [label="url contains 'wikipedia.org'",style=filled,color="Gold"];
    discard              [label="entry is discarded",style=filled,color="Red"];
    Actual_pageview      [label="We have a pageview",style=filled,color="Green"];
 
 
    Squid_log_line       -> decision_url
-   decision_url -> Actual_pageview   [ label="yes" ];
+   decision_url -> decision_url   [ label="yes" ];
    decision_url -> discard           [ label="no" ];
+   decision_proj -> Actual_pageview   [ label="yes" ];
+   decision_proj -> discard           [ label="no" ];
 
 };

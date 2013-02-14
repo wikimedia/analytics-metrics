@@ -67,7 +67,11 @@ def main():
     keepers = ['date', 'project', 'language', 'site']
 
     criteria = [
-            lambda r : r['old_init_request']
+            lambda r : r['url_path'],
+            lambda r : r['url_path'][0] == 'wiki',
+            lambda r : r['project'] == 'wikipedia',
+            #lambda r : r['mime_type'] == 'text/html',
+            #lambda r : r['status_code'] < 300
     ]
 
     counts = count_files(sys.argv[1:], keepers, criteria, count_event=10)
