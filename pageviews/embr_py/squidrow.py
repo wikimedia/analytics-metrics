@@ -34,6 +34,7 @@ with the relevant file path after squidrow has been imported
 cidr_ranges = None
 cidr_ranges_full = None
 gi = None
+mcc_mnc = None
 
 def load_cidr_ranges(path = os.path.join(os.path.split(__file__)[0], 'cidr_ranges.json')):
     global cidr_ranges, cidr_ranges_full
@@ -58,9 +59,18 @@ def load_pygeoip_dat(path = '/usr/share/GeoIP/GeoIPCity.dat'):
     except:
         logger.exception('could not load geoip database from: %s', path)
 
-logger.info('doing module level initialization')
+def load_mcc_mnc(path = os.path.join(os.path.split(__file__)[0], 'mcc_mnc.json')):
+    global mcc_mnc
+    try:
+        mcc_mnc = json.load(open(path))
+    except:
+        logger.exception('could not load mcc_mnc file from: %s', path)
+
+
+logger.debug('doing module level initialization')
 load_cidr_ranges()
 load_pygeoip_dat()
+load_mcc_mnc()
 
 
 
@@ -87,8 +97,22 @@ class SquidRow(object):
     """
 
 
-    #       1      2     3           4          5    6        7            8        9     10                11          12           13           14
-    ids = ['host','seq','timestamp','req_time','ip','status','reply_size','method','url','squid_hierarchy','mime_type_raw','ref_header','xff_header','agent_header_raw']
+    ids = ['host',              #1
+            'seq',              #2
+            'timestamp',        #3
+            'req_time',         #4
+            'ip',               #5
+            'status',           #6
+            'reply_size',       #7
+            'method',           #8
+            'url',              #9
+            'squid_hierarchy',  #10
+            'mime_type_raw',    #11
+            'ref_header',       #12
+            'xff_header',       #13
+            'agent_header_raw', #14
+            'accepted_langs',   #15
+            'x-cs']             #16
     
     def derived_field(fn):
         """ Decorator for specifying that a function should be used to compute a derived field
@@ -105,19 +129,22 @@ class SquidRow(object):
 
     def __init__(self, line):
         self.__line__ = line
-        toks = line.split(' ')
-        if len(toks) != 14:
-            #logging.debug('found row with %d space delimited tokens ' % (len(toks)))
-            pass
-        if len(toks) == 15:
-            #logging.debug('orig toks: %s' % (toks))
+        toks = line.strip().split(' ')
+        ntoks = len(toks)
+        if ntoks == 14:
+            self.__row__ = dict(zip(SquidRow.ids, toks + [None,None]))
+        elif ntoks == 15:
             del toks[11]
-            #logging.debug('new toks: %s' % (toks))
-        if len(toks) < 14:
-            logging.debug('malformed line disovered:\n\t%s', line)
-            raise ValueError
-        self.__row__ = dict(zip(SquidRow.ids, toks))
-        #logging.debug('self.__row__: %s' % (self.__row__))
+            self.__row__ = dict(zip(SquidRow.ids, toks + [None,None]))
+        elif ntoks == 16:
+            self.__row__ = dict(zip(SquidRow.ids, toks))
+        elif ntoks == 17:
+            del toks[11]
+            self.__row__ = dict(zip(SquidRow.ids, toks))
+
+        else:
+            logging.exception('malformed line disovered with %d toks:\n\n%s\n', ntoks, line)
+            raise ValueError('malformed line disovered with %d toks:\n\nt%s\n', ntoks, line)
 
 
     def __getitem__(self, key):
@@ -212,7 +239,7 @@ class SquidRow(object):
         site_ids = {'m' : 'M', 'zero' : 'Z'}
         netloc = self['netloc']
 
-        # strip www prefix if present
+        ## make sure www isn't in here
         if netloc[0] == 'www':
             netloc = netloc[1:]
 
@@ -244,6 +271,11 @@ class SquidRow(object):
 
     @derived_field
     def lang(self):
+        """returns the language code in the url if present, else None"""
+        return self['netloc_parsed']['lang']
+
+    @derived_field
+    def language(self):
         """returns the language code in the url if present, else None"""
         return self['netloc_parsed']['lang']
 
@@ -399,4 +431,12 @@ class SquidRow(object):
         if not self[geo_record]:
             return None
         return self['geo_record']['city']
+
+    @derived_field
+    def x_cs_parsed(self):
+        return map(int, self['x-cs'].split('-'))
+
+    @derived_field
+    def x_cs_str(self):
+        return mcc_mnc.get(self['x-cs'],None)
 
