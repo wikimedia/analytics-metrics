@@ -15,7 +15,7 @@ which currently prints to stdout a csv of the following format:
 2012-12-31,wikipedia,ar,X,10
 ````
 
-## Methodolody
+## Methodology
 
 this script does the bare minium in terms of filtering: only checking whether the url path begins with '/wiki', which corresponds to the flow chart below:
 
