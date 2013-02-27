@@ -35,13 +35,8 @@ digraph G {
    decision_has_wiki            [label="path contains 'wiki'", style=filled, color="Gold"];
    decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
    decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
-
-
-   is_sub_project         [label="is subproject", style=filled, color="Gold"];
-   is_main_project        [label="is main project", style=filled, color="Gold"];
-
-   decision_sub_project   [label="is one of 'commons','meta','incubator','species','strategy','outreach','usability','quality'", style=filled,color="Gold"];
-   decision_main_project  [label="is one of 'wikipedia','wiktionary','wikinews','wikibooks','wikisource','mediawiki','wikiversity','wikiqoute','m.wikipedia','wikivoyage','wikimediafoundation','wikidata'", style=filled,color="Gold"];
+   decision_sub_project         [label="is one of 'commons','meta','incubator','species','strategy','outreach','usability','quality'", style=filled,color="Gold"];
+   decision_main_project        [label="is one of 'wikipedia','wiktionary','wikinews','wikibooks','wikisource','mediawiki','wikiversity','wikiqoute','m.wikipedia','wikivoyage','wikimediafoundation','wikidata'", style=filled,color="Gold"];
 
    
    discard              [label="entry is discarded", style=filled, color="Red"];
