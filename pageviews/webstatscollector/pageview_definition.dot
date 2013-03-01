@@ -35,39 +35,56 @@ digraph G {
    decision_has_wiki            [label="path contains 'wiki'", style=filled, color="Gold"];
    decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
    decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
-   decision_sub_project         [label="is one of 'commons','meta','incubator','species','strategy','outreach','usability','quality'", style=filled,color="Gold"];
-   decision_main_project        [label="is one of 'wikipedia','wiktionary','wikinews','wikibooks','wikisource','mediawiki','wikiversity','wikiqoute','m.wikipedia','wikivoyage','wikimediafoundation','wikidata'", style=filled,color="Gold"];
+   decision_sub_project         [label=< 
+     <table>
+     <tr><td colspan="2">is one of:</td></tr>
+     <tr><td>commons   </td> <td>meta     </td> </tr>
+     <tr><td>incubator </td> <td>species  </td> </tr>
+     <tr><td>strategy  </td> <td>outreach </td> </tr>
+     <tr><td>usability </td> <td>quality  </td> </tr>
+     </table>
+     >, style=filled,color="Gold"];
+   decision_main_project        [label=<
+     <table>
+     <tr><td colspan="2">is one of:</td></tr>
+     <tr><td>wikipedia           </td> <td>wiktionary          </td> </tr>
+     <tr><td>wikinews            </td> <td>wikibooks           </td> </tr>
+     <tr><td>wikisource          </td> <td>mediawiki           </td> </tr>
+     <tr><td>wikiversity         </td> <td>wikiqoute           </td></tr>
+     <tr><td>m.wikipedia         </td> <td>wikivoyage          </td></tr>
+     <tr><td>wikimediafoundation </td> <td>wikidata            </td></tr>
+     </table>
+     >, style=filled,color="Gold"];
 
    
    discard              [label="entry is discarded", style=filled, color="Red"];
    Actual_pageview      [label="We have a pageview", style=filled, color="Green"];
 
 
-   Squid_log_line       -> decision_internal_traffic;
+   Squid_log_line               -> decision_internal_traffic;
 
-   decision_internal_traffic -> decision_org_domain      [ label="yes" ];
-   decision_internal_traffic -> discard                  [ label="no" ];
+   decision_internal_traffic    -> decision_org_domain          [ label="yes" ];
+   decision_internal_traffic    -> discard                      [ label="no" ];
 
-   decision_org_domain         -> decision_has_path [ label="yes"];
-   decision_org_domain         -> discard           [ label="no"];
+   decision_org_domain          -> decision_has_path            [ label="yes"];
+   decision_org_domain          -> discard                      [ label="no"];
 
-   decision_has_path    -> decision_has_wiki  [label="yes"];
-   decision_has_path    -> discard            [label="no"];
+   decision_has_path            -> decision_has_wiki            [ label="yes"];
+   decision_has_path            -> discard                      [ label="no"];
 
-   decision_has_wiki     -> decision_has_language_n_proj   [label="yes"];
-   decision_has_wiki     -> discard                        [label="no"];
+   decision_has_wiki            -> decision_has_language_n_proj [ label="yes"];
+   decision_has_wiki            -> discard                      [ label="no"];
 
-   decision_has_language_n_proj     -> decision_wikimedia_project   [label="yes"];
-   decision_has_language_n_proj     -> discard                     [label="no"];
+   decision_has_language_n_proj -> decision_wikimedia_project   [ label="yes"];
+   decision_has_language_n_proj -> discard                      [ label="no"];
 
-   decision_wikimedia_project     -> decision_sub_project   [label="yes"];
-   decision_wikimedia_project     -> decision_main_project  [label="no"];
+   decision_wikimedia_project   -> decision_sub_project         [ label="yes"];
+   decision_wikimedia_project   -> decision_main_project        [ label="no"];
 
-   decision_main_project     -> Actual_pageview   [label="yes"];
-   decision_main_project     -> discard           [label="no"];
+   decision_main_project        -> Actual_pageview              [ label="yes"];
+   decision_main_project        -> discard                      [ label="no"];
 
-   decision_sub_project     -> Actual_pageview   [label="yes"];
-   decision_sub_project     -> discard           [label="no"];
+   decision_sub_project         -> Actual_pageview              [ label="yes"];
+   decision_sub_project         -> discard                      [ label="no"];
    
-
 };
