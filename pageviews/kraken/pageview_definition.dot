@@ -1,0 +1,140 @@
+/* 
+   You can convert this graph to a PNG image with this command:
+
+   dot -Tpng  Pageview_definition.dot  -o Pageview_definition.png
+
+*/
+
+
+digraph G {
+     Legend [shape=none, margin="0,0", width=1, label=<
+     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+      <TR>
+       <TD><B>Legend</B></TD>
+      </TR>
+      <TR>
+       <TD bgcolor="CornflowerBlue">Start state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="red">Rejected state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="green">Accepted state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="gold">Decision state</TD>
+      </TR>
+     </TABLE>
+    >]
+ 
+   Squid_log_line              [label="Get a cache log line",style=filled,color="CornflowerBlue"];
+   decision_is_valid_url       [label="request is valid URL", style=filled, color="Gold"];
+   decision_internal_traffic   [label="request comes from internal WMF IP address", style=filled, color="Gold"];
+   decision_is_bot             [label="request comes from a bot", style=filled, color="Gold"];
+   decision_is_get_request     [label="request is GET", style=filled, color="Gold"];
+   decision_is_valid_request   [label="request is 20x or 302", style=filled, color="Gold"];
+   decision_is_valid_host      [label="host is not bits or upload ", style=filled, color="Gold"];
+
+   determine_pagetype          [label="determine pagetype of request", style=filled, color="CornflowerBlue"];
+   
+   is_desktop_request          [label="is a desktop request", style=filled, color="Gold"];
+   is_mobile_request           [label="is a mobile request", style=filled, color="Gold"];
+   is_banner_request           [label="is a banner request", style=filled, color="Gold"];
+   is_blog_request             [label="is a blog request", style=filled, color="Gold"];
+   is_commons_image_request    [label="is a commons image request", style=filled, color="Gold"];
+   is_other                    [label="is something else", style=filled, color="Gold"];
+
+   is_mobile_api               [label="api request", style=filled, color="Gold"];
+   is_mobile_search            [label="search request", style=filled, color="Gold"];
+   is_mobile_regular           [label="regular request", style=filled, color="Gold"];
+
+   is_desktop_api              [label="api request", style=filled, color="Gold"];
+   is_desktop_search           [label="search request", style=filled, color="Gold"];
+   is_desktop_regular          [label="regular request", style=filled, color="Gold"];
+
+   is_valid_blog_request       [label="Match one of the following:\n* http://testblog.wikimedia.org\n* http://blog.wikimedia.org/wp-login.php\n* http://blog.wikimedia.org/wp-admin/\n* http://blog.wikimedia.org/?s=  (i.e. searches)", style=filled, color="Gold"];    
+   is_special_page             [label="url contains Special:", style=filled, color="Gold"];
+   is_wiki_page                [label="url contains wiki/", style=filled, color="Gold"];
+
+   is_api_view_action          [label="api action=view", style=filled, color="Gold"];
+   is_api_view_referer         [label="referer is api action=view", style=filled, color="Gold"];
+
+   //decision_org_domain          [label="domain ends in .org", style=filled, color="Gold"];
+   //decision_has_path            [label="url has path", style=filled, color="Gold"];
+   //decision_has_wiki            [label="path contains 'wiki'", style=filled, color="Gold"];
+   //decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
+   //decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
+   //decision_sub_project         [label="is one of 'commons','meta','incubator','species','strategy','outreach','usability','quality'", style=filled,color="Gold"];
+   //decision_main_project        [label="is one of 'wikipedia','wiktionary','wikinews','wikibooks','wikisource','mediawiki','wikiversity','wikiqoute','m.wikipedia','wikivoyage','wikimediafoundation','wikidata'", style=filled,color="Gold"];
+
+
+   discard              [label="entry is discarded", style=filled, color="Red"];
+   Actual_pageview      [label="We have a pageview", style=filled, color="Green"];
+
+  Squid_log_line    -> decision_is_valid_host;
+
+  decision_is_valid_host        -> decision_is_valid_url        [ label="yes" ]; 
+  decision_is_valid_host        -> discard                      [ label="no" ];
+
+  decision_is_valid_url         -> decision_internal_traffic    [ label="yes" ]; 
+  decision_is_valid_url         -> discard                      [ label="no" ];
+
+  decision_internal_traffic    -> decision_is_bot               [ label="no" ];
+  decision_internal_traffic    -> discard                       [ label="yes" ];
+ 
+  decision_is_bot              -> decision_is_valid_request     [ label="no" ];
+  decision_is_bot              -> discard                       [ label="yes" ];
+
+  decision_is_valid_request    -> decision_is_get_request       [ label="yes" ];
+  decision_is_valid_request    -> discard                       [ label="no" ];
+
+  decision_is_get_request      -> determine_pagetype            [ label="yes" ];
+  decision_is_get_request      -> discard                       [ label="no" ];
+
+
+  determine_pagetype    -> is_desktop_request;
+  determine_pagetype    -> is_mobile_request;
+  determine_pagetype    -> is_banner_request;
+  determine_pagetype    -> is_commons_image_request;
+  determine_pagetype    -> is_blog_request;
+  determine_pagetype    -> is_other;
+  
+
+  is_desktop_request -> is_desktop_regular;
+  is_desktop_request -> is_desktop_api;
+  is_desktop_request -> is_desktop_search;
+
+  is_mobile_request -> is_mobile_regular;
+  is_mobile_request -> is_mobile_api;
+  is_mobile_request -> is_mobile_search;
+
+  is_blog_request   -> is_valid_blog_request
+
+  is_valid_blog_request  -> Actual_pageview  [ label="no" ];
+  is_valid_blog_request  -> discard          [ label="yes" ];
+
+  is_desktop_regular -> is_special_page;
+
+  is_special_page    -> is_wiki_page         [ label="no" ];
+  is_special_page    -> discard              [ label="yes" ];
+
+  is_wiki_page  -> Actual_pageview  [ label="yes" ];
+  is_wiki_page  -> discard          [ label="no" ];
+
+  is_desktop_search -> discard      [ label="yes" ];
+  is_mobile_search -> discard      [ label="yes" ];
+
+  is_desktop_api -> is_api_view_action
+
+  is_api_view_action -> Actual_pageview  [ label="yes" ];
+  is_api_view_action -> discard          [ label="no" ];
+
+  is_mobile_api -> is_api_view_referer
+
+  is_api_view_referer -> is_api_view_action  [ label="no" ];
+  is_api_view_referer -> discard  [ label="yes" ];
+
+  is_mobile_regular -> is_special_page
+
+
+};
