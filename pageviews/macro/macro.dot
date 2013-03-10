@@ -5,6 +5,11 @@
 Higher level diagram of how data flows, and how it is processed by the different
 implementations.
 
+
+Compile this using
+
+    twopi -Tpng macro.dot -o macro.png; eog macro.png
+
 */
 
 
