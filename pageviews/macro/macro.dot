@@ -1,0 +1,35 @@
+
+
+/*
+
+Higher level diagram of how data flows, and how it is processed by the different
+implementations.
+
+*/
+
+
+
+digraph G { 
+  ranksep=3
+  live_stream                    [label="Live stream"]
+  squid_logs                     [label="Squid logs"]
+  webstatscollector              [label="Webstats collector"]
+  kraken                         [label="Kraken"]
+  limn                           [label="Limn"]
+  wikistats                      [label="Wikistats"]
+  new_mobile_pageviews_reports   [label="New mobile pageviews reports"]
+  embr_py                        [label="Embr_py"]
+
+  live_stream       -> squid_logs                   [label="1:1000 ratio"]
+  live_stream       -> webstatscollector
+  live_stream       -> kraken
+  squid_logs        -> new_mobile_pageviews_reports 
+  squid_logs        -> embr_py
+  webstatscollector -> wikistats
+  kraken            -> limn
+
+};
+
+
+
+
