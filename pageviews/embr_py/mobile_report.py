@@ -22,6 +22,7 @@ if __name__ == '__main__':
         print 'usage: find /home/user/comparative_test_evan/ -maxdepth 1 -name "*201211*" -o -name "*201212*" -o -name "sampled-1000.log-20130101.gz" | ./mobile_pageviews.py'
         sys.exit(0)
     for fpath in files_to_parse:
+      print "Processing file => "+fpath
       fname = os.path.split(fpath)[1]
       with open('%s.match' % fname, 'w') as fmatch, open('%s.no_match' % fname, 'w') as fno_match:
           lines = subprocess.Popen(['zcat', fpath], stdout=subprocess.PIPE).stdout
