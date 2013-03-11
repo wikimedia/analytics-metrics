@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # report data after parsing
     rdata={}
 
-    if len(files_to_parse) > 0:
+    if len(files_to_parse) < 1:
       print "error: no filenames came through STDIN"
       sys.exit(0)
 
