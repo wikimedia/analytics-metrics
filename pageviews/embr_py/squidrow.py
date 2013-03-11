@@ -92,7 +92,7 @@ def load_mcc_mnc(path = os.path.join(os.path.split(__file__)[0], 'mcc_mnc.json')
 
 logger.debug('doing module level initialization')
 load_cidr_ranges()
-load_pygeoip_archive()
+#load_pygeoip_archive()
 load_mcc_mnc()
 
 
