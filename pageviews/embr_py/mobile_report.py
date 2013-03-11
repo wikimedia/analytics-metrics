@@ -9,8 +9,6 @@ from squidrow import SquidRow
 rdata={}
 
 
-for idx_argv in range(1,sys.argc+1):
-  print idx_argv
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
