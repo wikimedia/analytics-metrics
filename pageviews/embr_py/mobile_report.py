@@ -33,14 +33,14 @@ if __name__ == '__main__':
           for line in lines:
               try:
                   r = SquidRow(line)
-                  if r.old_init_request() and r.lang() and r.site() == "M":
-                    #fmatch.write(line)
+                  if r.old_init_request() and r.lang() and r.lang() != "meta" and r.site() == "M" and r.project() == "wikipedia":
+                    fmatch.write(line)
                     time_key = str(r.datetime().year) + '-' + str(r.datetime().month)
                     if time_key not in rdata:
                       rdata[time_key] = {}
 
                     rdata[time_key][r.lang()] = rdata[time_key].get(r.lang(),0) + 1
-                    #fno_match.write(line)
+                    fno_match.write(line)
               except:
                   fno_match.write(line)
     pprint(rdata)
