@@ -18,9 +18,13 @@ if __name__ == '__main__':
     # report data after parsing
     rdata={}
 
-    if len(sys.argv) < 2:
-        print 'usage: find /home/user/comparative_test_evan/ -maxdepth 1 -name "*201211*" -o -name "*201212*" -o -name "sampled-1000.log-20130101.gz" | ./mobile_pageviews.py'
-        sys.exit(0)
+    if len(files_to_parse) > 0:
+      print "error: no filenames came through STDIN"
+      sys.exit(0)
+
+    #if len(sys.argv) < 2:
+        #print 'usage: find /home/user/comparative_test_evan/ -maxdepth 1 -name "*201211*" -o -name "*201212*" -o -name "sampled-1000.log-20130101.gz" | ./mobile_pageviews.py'
+        #sys.exit(0)
     for fpath in files_to_parse:
       print "Processing file => "+fpath
       fname = os.path.split(fpath)[1]
