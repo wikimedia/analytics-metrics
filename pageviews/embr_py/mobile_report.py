@@ -4,10 +4,11 @@ import sys
 import subprocess
 import operator
 import json
-from collections import Counter
+from collections import Counter, defaultdict
+import pprint
 from pprint import pprint
 from squidrow import SquidRow
-
+import copy
 
 
 if __name__ == '__main__':
@@ -39,7 +40,9 @@ if __name__ == '__main__':
     fname = os.path.split(fpath)[1]
     with open('%s.match' % fname, 'w') as fmatch, open('%s.no_match' % fname, 'w') as fno_match:
         lines = subprocess.Popen(['zcat', fpath], stdout=subprocess.PIPE).stdout
-        for line in lines:
+        for i, line in enumerate(lines):
+          if i > 10000000:
+              break
           try:
             r = SquidRow(line)
             if ( r.old_init_request()           and r.lang()                      and 
@@ -48,20 +51,28 @@ if __name__ == '__main__':
                 r.title()   != "Special:Random" and r.title() != "Special:BannerRandom"
                 ):
               #print "[DBG]"+r.url()
-              time_key = str(r.datetime().year) + '-' + str(r.datetime().month)
+              #time_key = str(r.datetime().year) + '-' + str(r.datetime().month)
+              time_key = str(r.date())
               rdata[time_key]['lang='        + r.lang()]        += 1
               rdata[time_key]['site='        + r.site()]        += 1
-              rdata[time_key]['status_code=' + r.status_code()] += 1
+              rdata[time_key]['status_code=' + str(r.status_code())] += 1
               rdata[time_key]['host='        + r.host()]        += 1
               rdata[time_key]['mime_type'    + r.mime_type()]   += 1
-              rdata[time_key]['netloc='      + r.netloc()]      += 1
-              for arg_key in r.url_args().__keys__:
+              rdata[time_key]['netloc='      + str(r.netloc())]      += 1
+              for arg_key in r.url_args().keys():
                 rdata[time_key]['arg_key='+arg_key] += 1
-              for arg_key in r.url_args().values():
-                rdata[time_key]['arg_val='+arg_val] += 1
+              for item in r.url_args().items():
+                rdata[time_key]['arg_val='+str(item)] += 1
           except:
             1
-  top_10_languages = sorted(rdata.items(), key=operator.itemgetter(1))[-10:]
-  #pprint(top_10_languages)
-  #json.dump(top_10_languages, open("/tmp/nov.json", 'w'))
+
+  sorted_rdata = sorted(rdata.items())
+  pprint(sorted_rdata[1:])
+  for (first_date, first_counter), (second_date, second_counter) in zip(sorted_rdata, sorted_rdata[1:]) + zip(sorted_rdata[:1], sorted_rdata[-1:]):
+  #for (first_date, first_counter), (second_date, second_counter) in zip(sorted_rdata[:1], sorted_rdata[-1:]):
+      difference = copy.deepcopy(second_counter)
+      difference.subtract(first_counter)
+      print '###########################################'
+      print 'first_date: %s, second_date: %s' % (first_date, second_date)
+      pprint(difference.most_common(10))
 

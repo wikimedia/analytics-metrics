@@ -14,7 +14,7 @@ if __name__ == '__main__':
         for line in lines:
             try:
                 r = SquidRow(line)
-                if r.old_init_request():
+                if r.old_init_request() and r.project() == 'wikipedia':
                     fmatch.write(line)
                 else:
                     fno_match.write(line)
