@@ -2,6 +2,9 @@
 import os.path
 import sys
 import subprocess
+import operator
+import json
+from collections import Counter
 from pprint import pprint
 from squidrow import SquidRow
 
@@ -18,7 +21,11 @@ if __name__ == '__main__':
       break
 
   # report data after parsing
-  rdata={}
+  rdata=defaultdict(Counter)
+
+  ## url count with/without spaces
+  #rspace={}
+
 
   if len(files_to_parse) < 1:
     print "error: no filenames came through STDIN"
@@ -35,19 +42,26 @@ if __name__ == '__main__':
         for line in lines:
           try:
             r = SquidRow(line)
-            if ( r.old_init_request()            and r.lang()                     and 
+            if ( r.old_init_request()           and r.lang()                      and 
                 r.lang()    != "meta"           and r.site()  == "M"              and 
                 r.project() == "wikipedia"      and r.title() != "Special:Search" and 
                 r.title()   != "Special:Random" and r.title() != "Special:BannerRandom"
                 ):
-              #print r.title()+"=>"+r.url()
-              #fmatch.write(line)
+              #print "[DBG]"+r.url()
               time_key = str(r.datetime().year) + '-' + str(r.datetime().month)
-              if time_key not in rdata:
-                rdata[time_key] = {}
-
-              rdata[time_key][r.lang()] = rdata[time_key].get(r.lang(),0) + 1
+              rdata[time_key]['lang='        + r.lang()]        += 1
+              rdata[time_key]['site='        + r.site()]        += 1
+              rdata[time_key]['status_code=' + r.status_code()] += 1
+              rdata[time_key]['host='        + r.host()]        += 1
+              rdata[time_key]['mime_type'    + r.mime_type()]   += 1
+              rdata[time_key]['netloc='      + r.netloc()]      += 1
+              for arg_key in r.url_args().__keys__:
+                rdata[time_key]['arg_key='+arg_key] += 1
+              for arg_key in r.url_args().values():
+                rdata[time_key]['arg_val='+arg_val] += 1
           except:
             1
-  pprint(rdata)
+  top_10_languages = sorted(rdata.items(), key=operator.itemgetter(1))[-10:]
+  #pprint(top_10_languages)
+  #json.dump(top_10_languages, open("/tmp/nov.json", 'w'))
 
