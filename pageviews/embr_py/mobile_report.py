@@ -74,7 +74,7 @@ if __name__ == '__main__':
   #
 
   sorted_rdata = sorted(rdata.items())
-  pprint(sorted_rdata[1:])
+  #pprint(sorted_rdata[1:])
   for (first_date, first_counter), (second_date, second_counter) in zip(sorted_rdata, sorted_rdata[1:]) + zip(sorted_rdata[:1], sorted_rdata[-1:]):
   #for (first_date, first_counter), (second_date, second_counter) in zip(sorted_rdata[:1], sorted_rdata[-1:]):
       difference = copy.deepcopy(second_counter)
