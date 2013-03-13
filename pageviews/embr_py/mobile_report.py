@@ -9,6 +9,7 @@ import pprint
 from pprint import pprint
 from squidrow import SquidRow
 import copy
+import matplotlib
 
 
 if __name__ == '__main__':
@@ -53,18 +54,24 @@ if __name__ == '__main__':
               #print "[DBG]"+r.url()
               #time_key = str(r.datetime().year) + '-' + str(r.datetime().month)
               time_key = str(r.date())
-              rdata[time_key]['lang='        + r.lang()]        += 1
-              rdata[time_key]['site='        + r.site()]        += 1
+              rdata[time_key]['lang='        + r.lang()]             += 1
+              rdata[time_key]['site='        + r.site()]             += 1
               rdata[time_key]['status_code=' + str(r.status_code())] += 1
-              rdata[time_key]['host='        + r.host()]        += 1
-              rdata[time_key]['mime_type'    + r.mime_type()]   += 1
+              rdata[time_key]['host='        + r.host()]             += 1
+              rdata[time_key]['mime_type'    + r.mime_type()]        += 1
               rdata[time_key]['netloc='      + str(r.netloc())]      += 1
               for arg_key in r.url_args().keys():
                 rdata[time_key]['arg_key='+arg_key] += 1
-              for item in r.url_args().items():
+              for item    in r.url_args().items():
                 rdata[time_key]['arg_val='+str(item)] += 1
           except:
             1
+
+  #
+  # We decided on some features above ^^
+  # And now we get the features with the biggest difference between each two consecutive days
+  # Hopefuly among those, we will be able to find some features which explain the bump.
+  #
 
   sorted_rdata = sorted(rdata.items())
   pprint(sorted_rdata[1:])
