@@ -23,8 +23,8 @@ class SimpleBarChart:
   def __init__(self):
     self.fig = plt.figure()
     self.ax  = self.fig.add_subplot(111)
-    self.fig.set_figheight( 9)
-    self.fig.set_figwidth( 27)
+    self.fig.set_figwidth(15)
+    self.fig.set_size_inches([30,8])
   def setTitle(self,title):
     self.ax.set_title(title)
   def populate(self,bars,labels):
@@ -62,7 +62,7 @@ class SimpleBarChart:
 if __name__ == '__main__':
   files_to_parse=[]
 
-  limit_rows = 300000000000
+  limit_rows = 300000000000000
   while True:
     try:
       i = raw_input()
@@ -170,14 +170,19 @@ if __name__ == '__main__':
   filenames_charts = []
 
   for key_class in [keys_lang,keys_site,keys_statuscode,keys_host,keys_netloc,keys_mimetype]:
+
     for k in key_class:
       v = []
+      t = 0
       for d in dates:
         if rdata[d][k]:
+          t += rdata[d][str(k)]
           v.append(rdata[d][str(k)])
         else:
           v.append(0)
 
+      if t < 80:
+        continue
       g = SimpleBarChart()
       g.populate(v,dates)
       g.setTitle("Chart for key => "+k)
