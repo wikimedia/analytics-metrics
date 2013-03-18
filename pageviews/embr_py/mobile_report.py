@@ -94,7 +94,7 @@ if __name__ == '__main__':
               break
           try:
             r = SquidRow(line)
-            if ( r.old_init_request()           and r.lang()                      and 
+            if ( r.is_valid()                   and r.lang()                      and 
                 r.lang()    != "meta"           and r.site()  == "M"              and 
                 r.project() == "wikipedia"      and r.title() != "Special:Search" and 
                 r.title()   != "Special:Random" and r.title() != "Special:BannerRandom"

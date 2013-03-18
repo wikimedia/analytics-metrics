@@ -422,6 +422,30 @@ class SquidRow(object):
             status = None
         return status
 
+#
+# In kraken the logic for a mobile pageview is currently located in
+# (1) kraken-generic/src/main/java/org/wikimedia/analytics/kraken/pageview/Pageview.java
+# (2) kraken-generic/src/main/java/org/wikimedia/analytics/kraken/pageview/PageviewFilter.java
+# 
+# Everything starts in (1) in the method isPageview() which then calls:
+#  
+#  * initialPageviewValidation()
+#  * secondStepPageviewValidation()
+# 
+# 
+    @cache
+    def is_valid(self):
+        # print self.url_path()[0]+' => '+self.url_path()[1]
+        # kraken isValidMobilePageviewMimeType
+        # kraken isValidResponseCode
+        # kraken isValidRequestMethod
+        return (  self.mime_type() == 'text/html' or self.mime_type() == 'text/vnd.wap.wml' or self.mime_type() == 'application/json' ) and \
+               ( (self.status_code() >= 200 and self.status_code() < 210) or self.status_code() == 302 or self.status_code() == 304   ) and \
+               (  self.method() == 'GET') and \
+               (self.url_path()[0] == 'wiki' )
+
+
+
     @cache
     def init_request(self):
         """returns whether the log line represents a text/html request with status code < 300 whose url path starts with /wiki/"""
