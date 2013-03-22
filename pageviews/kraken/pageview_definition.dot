@@ -30,10 +30,10 @@ digraph G {
    Squid_log_line              [label="Get a cache log line",style=filled,color="CornflowerBlue"];
    decision_is_valid_url       [label="request is valid URL", style=filled, color="Gold"];
    decision_internal_traffic   [label="request comes from internal WMF IP address", style=filled, color="Gold"];
-   decision_is_bot             [label="request comes from a bot", style=filled, color="Gold"];
+   decision_is_bot             [label="request comes from a bot (http|crawler|spider|bot)", style=filled, color="Gold"];
    decision_is_get_request     [label="request is GET", style=filled, color="Gold"];
-   decision_is_valid_request   [label="request is 20x or 302", style=filled, color="Gold"];
-   decision_is_valid_host      [label="host is not bits or upload ", style=filled, color="Gold"];
+   decision_is_valid_request   [label="request is 20x or 30x", style=filled, color="Gold"];
+   decision_is_valid_host      [label="domain is not bits or upload but matches http://[language code|special wiki].[m|zero]?.[domain].org", style=filled, color="Gold"];
 
    determine_pagetype          [label="determine pagetype of request", style=filled, color="CornflowerBlue"];
    
@@ -59,16 +59,7 @@ digraph G {
    is_api_view_action          [label="api action=view", style=filled, color="Gold"];
    is_api_view_referer         [label="referer is api action=view", style=filled, color="Gold"];
 
-   //decision_org_domain          [label="domain ends in .org", style=filled, color="Gold"];
-   //decision_has_path            [label="url has path", style=filled, color="Gold"];
-   //decision_has_wiki            [label="path contains 'wiki'", style=filled, color="Gold"];
-   //decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
-   //decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
-   //decision_sub_project         [label="is one of 'commons','meta','incubator','species','strategy','outreach','usability','quality'", style=filled,color="Gold"];
-   //decision_main_project        [label="is one of 'wikipedia','wiktionary','wikinews','wikibooks','wikisource','mediawiki','wikiversity','wikiqoute','m.wikipedia','wikivoyage','wikimediafoundation','wikidata'", style=filled,color="Gold"];
-
-
-   discard              [label="entry is discarded", style=filled, color="Red"];
+   discard              [label="Log line does not count as a pageview", style=filled, color="Red"];
    Actual_pageview      [label="We have a pageview", style=filled, color="Green"];
 
   Squid_log_line    -> decision_is_valid_host;

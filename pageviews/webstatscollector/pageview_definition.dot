@@ -57,14 +57,14 @@ digraph G {
      >, style=filled,color="Gold"];
 
    
-   discard              [label="entry is discarded", style=filled, color="Red"];
+   discard              [label="Log line does not count as a pageview", style=filled, color="Red"];
    Actual_pageview      [label="We have a pageview", style=filled, color="Green"];
 
 
    Squid_log_line               -> decision_internal_traffic;
 
-   decision_internal_traffic    -> decision_org_domain          [ label="yes" ];
-   decision_internal_traffic    -> discard                      [ label="no" ];
+   decision_internal_traffic    -> decision_org_domain          [ label="no" ];
+   decision_internal_traffic    -> discard                      [ label="yes" ];
 
    decision_org_domain          -> decision_has_path            [ label="yes"];
    decision_org_domain          -> discard                      [ label="no"];
