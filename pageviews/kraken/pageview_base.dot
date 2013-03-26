@@ -1,0 +1,68 @@
+/* 
+   You can convert this graph to a PNG image with this command:
+
+   dot -Tpng  Pageview_definition.dot  -o Pageview_definition.png
+
+*/
+
+
+digraph G {
+     Legend [shape=none, margin="0,0", width=1, label=<
+     <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+      <TR>
+       <TD><B>Legend</B></TD>
+      </TR>
+      <TR>
+       <TD bgcolor="CornflowerBlue">Start state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="red">Rejected state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="green">Accepted state</TD>
+      </TR>
+      <TR>
+       <TD bgcolor="gold">Decision state</TD>
+      </TR>
+     </TABLE>
+    >]
+ 
+   Squid_log_line              [label="Get a cache log line",style=filled,color="CornflowerBlue"];
+   decision_internal_traffic   [label="request comes from internal WMF IP address", style=filled, color="Gold"];
+   decision_is_bot             [label="request comes from a bot (http|crawler|spider|bot)", style=filled, color="Gold"];
+   decision_is_get_request     [label="request is GET", style=filled, color="Gold"];
+   decision_is_valid_request   [label="request is 20x or 30x", style=filled, color="Gold"];
+   decision_is_valid_host      [label="domain matches http://[language code|special wiki].[m|zero]?.[domain].org", style=filled, color="Gold"];
+   valid_special_wikis         [label="domain is one of * commons\n * meta\n * species\n * incubator\n * strategy\n * usability\n * outreach\n *quality\n *mediawiki]", style=filled, color="Purple"];
+   valid_domains               [label="special wiki is one of * wikibooks\n * wiktionary\n * wikidata\n * wikinews\n * wikipedia\n * wikiquote\n * wikisource\n * wikiversity\n * wikivoyage\n * wikimedia\n *mediawiki\n * wikimediafoundation", style=filled, color="Purple"];
+   valid_language_codes        [label="language code is one of see https://gerrit.wikimedia.org\n/r/gitweb?p=operations/mediawiki-config.git;\na=blob_plain;f=langlist;hb=HEAD", stye=filled, color="Purple"];
+   
+
+
+   discard              [label="Log line should not count towards a pageview metric", style=filled, color="Red"];
+   continue             [label="Log line can be further processed", style=filled, color="Green"];
+
+  Squid_log_line    -> decision_is_valid_host;
+
+  decision_is_valid_host        -> decision_internal_traffic    [ label="yes" ]; 
+  decision_is_valid_host        -> discard                      [ label="no" ];
+
+  decision_is_valid_host       -> valid_special_wikis           [ label="details"]
+  decision_is_valid_host       -> valid_domains                 [ label="details"]
+  decision_is_valid_host       -> valid_language_codes          [ label="details"]
+
+  
+  decision_internal_traffic    -> decision_is_bot               [ label="no" ];
+  decision_internal_traffic    -> discard                       [ label="yes" ];
+ 
+  decision_is_bot              -> decision_is_valid_request     [ label="no" ];
+  decision_is_bot              -> discard                       [ label="yes" ];
+
+  decision_is_valid_request    -> decision_is_get_request       [ label="yes" ];
+  decision_is_valid_request    -> discard                       [ label="no" ];
+
+  decision_is_get_request      -> discard                       [ label="no" ];
+ decision_is_get_request       -> continue                      [ label="yes" ];
+  
+
+};
