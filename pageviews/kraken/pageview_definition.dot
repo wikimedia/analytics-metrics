@@ -38,19 +38,18 @@ digraph G {
    is_commons_image_request    [label="is a commons image request", style=filled, color="Gold"];
    is_other                    [label="is something else", style=filled, color="Gold"];
 
-   is_mobile_api               [label="api request", style=filled, color="Gold"];
-   is_mobile_search            [label="search request", style=filled, color="Gold"];
-   is_mobile_regular           [label="regular request", style=filled, color="Gold"];
+   is_mobile_api               [label="mobile api request", style=filled, color="Gold"];
+   is_mobile_search            [label="mobile search request", style=filled, color="Gold"];
+   is_mobile_regular           [label="mobile regular request", style=filled, color="Gold"];
 
-   is_desktop_api              [label="api request", style=filled, color="Gold"];
-   is_desktop_search           [label="search request", style=filled, color="Gold"];
-   is_desktop_regular          [label="regular request", style=filled, color="Gold"];
+   is_desktop_api              [label="desktop api request", style=filled, color="Gold"];
+   is_desktop_search           [label="desktop search request", style=filled, color="Gold"];
+   is_desktop_regular          [label="desktop regular request", style=filled, color="Gold"];
 
    is_valid_blog_request       [label="Match one of the following:\n* http://testblog.wikimedia.org\n* http://blog.wikimedia.org/wp-login.php\n* http://blog.wikimedia.org/wp-admin/\n* http://blog.wikimedia.org/?s=  (i.e. searches)", style=filled, color="Gold"];    
-   is_special_page             [label="url contains Special:", style=filled, color="Gold"];
    is_wiki_page                [label="url contains wiki/ or w/index.php", style=filled, color="Gold"];
 
-   is_api_view_action          [label="api action=view", style=filled, color="Gold"];
+   is_api_view_action          [label="api action=view || action=mobileview", style=filled, color="Gold"];
    is_api_view_referer         [label="referer is api action=view", style=filled, color="Gold"];
 
    discard                     [label="Log line does not count as a pageview", style=filled, color="Red"];
@@ -79,16 +78,13 @@ digraph G {
   is_valid_blog_request  -> Actual_pageview  [ label="no" ];
   is_valid_blog_request  -> discard          [ label="yes" ];
 
-  is_desktop_regular -> is_special_page;
-
-  is_special_page    -> is_wiki_page         [ label="no" ];
-  is_special_page    -> discard              [ label="yes" ];
+  is_desktop_regular -> is_wiki_page 
 
   is_wiki_page  -> Actual_pageview  [ label="yes" ];
   is_wiki_page  -> discard          [ label="no" ];
 
   is_desktop_search -> discard      [ label="yes" ];
-  is_mobile_search -> discard      [ label="yes" ];
+  is_mobile_search -> discard       [ label="yes" ];
 
   is_desktop_api -> is_api_view_action
 
@@ -98,9 +94,9 @@ digraph G {
   is_mobile_api -> is_api_view_referer
 
   is_api_view_referer -> is_api_view_action  [ label="no" ];
-  is_api_view_referer -> discard  [ label="yes" ];
+  is_api_view_referer -> discard             [ label="yes" ];
 
-  is_mobile_regular -> is_special_page
+  is_mobile_regular -> is_wiki_page 
 
 
 };
