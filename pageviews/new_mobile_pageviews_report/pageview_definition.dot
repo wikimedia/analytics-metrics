@@ -29,28 +29,38 @@ digraph G {
      </TABLE>
     >];
 
-   Squid_log_line       [label="Get a squid log line",style=filled,color="CornflowerBlue" ];
-   decision_status_code [label="status code is 30x/20x ?",style=filled,color="Gold"];
-   decision_mimetype    [label="mimetype is \"-\" or \"text/html\"",style=filled,color="Gold"];
-   decision_no_bots     [label="ip isn't in bot ranges and UA doesn't contain\n \"bot\" or \"crawler\" or \"google\" ?",style=filled,color="Gold"];
-   decision_url         [label="url is like\nhttp(s)://(wikiproject).m.wikipedia.org/wiki/....\nhttp(s)://(wikiproject).m.wikipedia.org/w/index.php?....\nhttp(s)://(wikiproject).m.wikipedia.org/w/api.php?....",
-                         style=filled,color="Gold"
-                        ];
-   discard              [label="entry is discarded",style=filled,color="Red"];
-   Actual_pageview      [label="We have a pageview",style=filled,color="Green"];
+   start                   [label="Get a squid log line",style=filled,color="CornflowerBlue" ];
+   decision_status_code    [label="status code is 302,304,20x",style=filled,color="Gold"];
+   decision_mimetype       [label="mimetype is one of: \ntext/html\ntext/vnd.wap\napplication/json",style=filled,color="Gold"];
+   decision_bots           [label="ip isn't in bot ranges and UA doesn't contain one of these\n \"bot\"\n\"crawler\"\n\"google\"",style=filled,color="Gold"];
+   decision_wikiproject    [label="url is like\nhttp(s)://(wikiproject).m.wikipedia.org/wiki/",
+                            style=filled,color="Gold"
+                           ];
+   decision_method         [label="method is GET",style=filled,color="Gold"];
+   decision_minimumfields  [label="has at least 9 fields",style=filled,color="Gold"];
+   discard                 [label="entry is discarded",style=filled,color="Red"];
+   accept                  [label="We have a pageview",style=filled,color="Green"];
 
 
-   Squid_log_line       -> decision_status_code
-   decision_status_code -> decision_url      [ label="yes" ];
-   decision_status_code -> discard           [ label="no" ];
+   start                  -> decision_minimumfields;
 
-   decision_url         -> decision_mimetype [ label="yes"];
-   decision_url         -> discard           [ label="no"];
+   decision_minimumfields -> decision_status_code  [ label="yes"];
+   decision_minimumfields -> discard               [ label="no"];
 
-   decision_mimetype    -> decision_no_bots  [label="yes"];
-   decision_mimetype    -> discard           [label="no"];
+   decision_status_code   -> decision_bots         [ label="yes" ];
+   decision_status_code   -> discard               [ label="no" ];
 
-   decision_no_bots     -> Actual_pageview   [label="yes"];
-   decision_no_bots     -> discard           [label="no"];
+   decision_bots          -> decision_wikiproject  [label="yes"];
+   decision_bots          -> discard               [label="no"];
+
+   decision_wikiproject   -> decision_method       [label="yes"];
+   decision_wikiproject   -> discard               [label="no"];
+
+   decision_method        -> decision_mimetype     [label="yes"];
+   decision_method        -> discard               [label="no"];
+
+   decision_mimetype      -> accept                [label="yes"];
+   decision_mimetype      -> discard               [label="no"];
+
 
 };
