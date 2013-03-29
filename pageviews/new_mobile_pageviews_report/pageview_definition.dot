@@ -32,11 +32,12 @@ digraph G {
    start                   [label="Get a squid log line",style=filled,color="CornflowerBlue" ];
    decision_status_code    [label="status code is 302,304,20x",style=filled,color="Gold"];
    decision_mimetype       [label="mimetype is one of: \ntext/html\ntext/vnd.wap\napplication/json",style=filled,color="Gold"];
-   decision_bots           [label="ip isn't in bot ranges and UA doesn't contain one of these\n \"bot\"\n\"crawler\"\n\"google\"",style=filled,color="Gold"];
-   decision_wikiproject    [label="url is like\nhttp(s)://(wikiproject).m.wikipedia.org/wiki/",
+   //decision_bots           [label="ip isn't in bot ranges and UA doesn't contain one of these\n \"bot\"\n\"crawler\"\n\"google\"",style=filled,color="Gold"];
+   decision_wikiproject    [label="url is like\nhttp://(wikiproject).m.wiki*.org/wiki/ || \nhttp://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view ||\n http://(wikiproject).m.wiki*.org/w/index.php",
                             style=filled,color="Gold"
                            ];
-   decision_method         [label="method is GET",style=filled,color="Gold"];
+   decision_referer        [label="referer is http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view", style=filled, color="Gold"];
+   decision_method         [label="method is get (case insensitive)",style=filled,color="Gold"];
    decision_minimumfields  [label="has at least 9 fields",style=filled,color="Gold"];
    discard                 [label="entry is discarded",style=filled,color="Red"];
    accept                  [label="We have a pageview",style=filled,color="Green"];
@@ -47,15 +48,15 @@ digraph G {
    decision_minimumfields -> decision_status_code  [ label="yes"];
    decision_minimumfields -> discard               [ label="no"];
 
-   decision_status_code   -> decision_bots         [ label="yes" ];
+   decision_status_code   -> decision_wikiproject  [ label="yes" ];
    decision_status_code   -> discard               [ label="no" ];
 
-   decision_bots          -> decision_wikiproject  [label="yes"];
-   decision_bots          -> discard               [label="no"];
+   decision_wikiproject   -> decision_referer      [label="yes" ];
+   decision_wikiproject   -> discard               [label="no" ];
 
-   decision_wikiproject   -> decision_method       [label="yes"];
-   decision_wikiproject   -> discard               [label="no"];
-
+   decision_referer       -> decision_method       [ label="no" ];
+   decision_referer       -> discard               [ label="yes" ];
+ 
    decision_method        -> decision_mimetype     [label="yes"];
    decision_method        -> discard               [label="no"];
 
