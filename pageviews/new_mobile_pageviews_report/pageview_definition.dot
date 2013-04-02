@@ -33,10 +33,10 @@ digraph G {
    decision_status_code    [label="status code is 302,304,20x",style=filled,color="Gold"];
    decision_mimetype       [label="mimetype is one of: \ntext/html\ntext/vnd.wap\napplication/json",style=filled,color="Gold"];
    //decision_bots           [label="ip isn't in bot ranges and UA doesn't contain one of these\n \"bot\"\n\"crawler\"\n\"google\"",style=filled,color="Gold"];
-   decision_wikiproject    [label="url is like\nhttp://(wikiproject).m.wiki*.org/wiki/ || \nhttp://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view ||\n http://(wikiproject).m.wiki*.org/w/index.php",
-                            style=filled,color="Gold"
-                           ];
-   decision_referer        [label="referer is http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view", style=filled, color="Gold"];
+   decision_wikiproject    [label="url is like\nhttp://(wikiproject).m.wiki*.org/wiki/ || \n http://(wikiproject).m.wiki*.org/w/index.php",
+                            style=filled,color="Gold"];
+   decision_api            [label="url is like\n http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view", style=filled,color="Gold"];                        
+   decision_referer        [label="referer is http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view&title=foo\n make sure that title in url is also foo", style=filled, color="Gold"];
    decision_method         [label="method is get (case insensitive)",style=filled,color="Gold"];
    decision_minimumfields  [label="has at least 9 fields",style=filled,color="Gold"];
    discard                 [label="entry is discarded",style=filled,color="Red"];
@@ -48,20 +48,25 @@ digraph G {
    decision_minimumfields -> decision_status_code  [ label="yes"];
    decision_minimumfields -> discard               [ label="no"];
 
-   decision_status_code   -> decision_wikiproject  [ label="yes" ];
+   decision_status_code   -> decision_method       [ label="yes" ];
    decision_status_code   -> discard               [ label="no" ];
 
-   decision_wikiproject   -> decision_referer      [label="yes" ];
-   decision_wikiproject   -> discard               [label="no" ];
+   decision_method        -> decision_mimetype     [ label="yes" ];
+   decision_method        -> discard               [ label="no" ];
 
-   decision_referer       -> decision_method       [ label="no" ];
-   decision_referer       -> discard               [ label="yes" ];
+   decision_mimetype      -> decision_wikiproject  [ label="regular pageview" ];
+   decision_mimetype      -> decision_api          [ label="api pageview" ];
+   decision_mimetype      -> discard               [ label="no" ];
+
+   decision_wikiproject   -> accept                [ label="yes" ];
+   decision_wikiproject   -> discard               [ label="no" ];
+
+   decision_api           -> decision_referer      [ label="yes" ];
+   decision_api           -> discard               [ label="no" ];
+
+   decision_referer       -> discard               [ label="no" ];
+   decision_referer       -> accept                [ label="yes" ];
  
-   decision_method        -> decision_mimetype     [label="yes"];
-   decision_method        -> discard               [label="no"];
-
-   decision_mimetype      -> accept                [label="yes"];
-   decision_mimetype      -> discard               [label="no"];
 
 
 };
