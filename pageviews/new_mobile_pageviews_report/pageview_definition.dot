@@ -36,17 +36,16 @@ digraph G {
    decision_wikiproject    [label="url is like\nhttp://(wikiproject).m.wiki*.org/wiki/ || \n http://(wikiproject).m.wiki*.org/w/index.php",
                             style=filled,color="Gold"];
    decision_api            [label="url is like\n http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view", style=filled,color="Gold"];                        
-   decision_referer        [label="referer is http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view&title=foo\n make sure that title in url is also foo", style=filled, color="Gold"];
+   decision_referer        [label="referer is http://(wikiproject).m.wiki*.org/w/api.php?action=(mobile)view&title=page\n make sure that title in url is also foo", style=filled, color="Gold"];
    decision_method         [label="method is get (case insensitive)",style=filled,color="Gold"];
-   decision_minimumfields  [label="has at least 9 fields",style=filled,color="Gold"];
    discard                 [label="entry is discarded",style=filled,color="Red"];
    accept                  [label="We have a pageview",style=filled,color="Green"];
 
+   example1                [label="URL=https://en.m.wikipedia.org/w/api.php?format=json&action=query\n&prop=langlinks&llurl=true&lllimit=max&titles=Tropical+cyclone\nreferer=https://en.m.wikipedia.org/wiki/Tropical_cyclone\n\nresult: NOT a pageview; search for *titles* and decode API title to regular MW title", style=filled, color="Purple"];
 
-   start                  -> decision_minimumfields;
+   example2                [label="URL=https://en.m.wikipedia.org/w/api.php?format=json&action=mobileview&page=Tornado\n&variant=en&redirects=yes&prop=sections%7Ctext&noheadings=yes\n&sectionprop=level%7Cline%7Canchor&sections=all\nreferer=https://en.m.wikipedia.org/wiki/Tropical_cyclone\n\nresult: IS a pageview, search *page*, and decode API title to regular MW title", style=filled, color="Purple"];
 
-   decision_minimumfields -> decision_status_code  [ label="yes"];
-   decision_minimumfields -> discard               [ label="no"];
+   start                  -> decision_status_code;
 
    decision_status_code   -> decision_method       [ label="yes" ];
    decision_status_code   -> discard               [ label="no" ];
@@ -65,6 +64,8 @@ digraph G {
    decision_api           -> discard               [ label="no" ];
 
    decision_referer       -> discard               [ label="no" ];
+   decision_referer       -> example1              [ label="example1" ];
+   decision_referer       -> example2              [ label="example2" ];
    decision_referer       -> accept                [ label="yes" ];
  
 
