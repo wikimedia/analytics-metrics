@@ -5,7 +5,6 @@
    see https://en.wikipedia.org/wiki/DOT_(graph_description_language) for syntax
 */
 
-
 digraph G {
      Legend [shape=none, margin="0,0", width=1, label=<
      <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
@@ -28,9 +27,9 @@ digraph G {
     >]
  
    webrequest_log_line         [label="Receive request from the mobile pageview decision tree\n (https://github.com/wikimedia/metrics/blob/master/pageviews/kraken/pageview_definition.png)",style=filled,color="CornflowerBlue"];
-   decision_is_zero_traffic    [label="request comes from a Wikipedia Zero carrier ip4/ip6 cidr range\n (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
+   decision_is_zero_traffic    [label="Request comes from a Wikipedia Zero carrier ip4/ip6 cidr range\n (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
    decision_is_opera           [label="Wikipedia Zero config is OPERA", style=filled, color="Gold"];
-   //decision_is_test            [label="Wikipedia Zero config is TEST", style=filled, color="Gold"];
+   //decision_is_test          [label="Wikipedia Zero config is TEST", style=filled, color="Gold"];
    process_xff                 [label="Replace ip4/ip6 addresss with left-most address from XFF field", style=filled, color="Gold"];
 
    discard                     [label="Log line should not count towards the Zero pageview metric", style=filled, color="Red"];
