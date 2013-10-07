@@ -27,8 +27,8 @@ digraph G {
      </TABLE>
     >]
  
-   webrequest_log_line         [label="Get a cache log line",style=filled,color="CornflowerBlue"];
-   decision_is_zero_traffic    [label="request comes from a Wikipedia Zero carrier ip4/ip6 cidr range (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
+   webrequest_log_line         [label="Receive request from the mobile pageview decision tree\n (https://github.com/wikimedia/metrics/blob/master/pageviews/kraken/pageview_definition.png)",style=filled,color="CornflowerBlue"];
+   decision_is_zero_traffic    [label="request comes from a Wikipedia Zero carrier ip4/ip6 cidr range\n (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
    decision_is_opera           [label="Wikipedia Zero config is OPERA", style=filled, color="Gold"];
    //decision_is_test            [label="Wikipedia Zero config is TEST", style=filled, color="Gold"];
    process_xff                 [label="Replace ip4/ip6 addresss with left-most address from XFF field", style=filled, color="Gold"];
