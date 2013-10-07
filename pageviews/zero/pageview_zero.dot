@@ -27,22 +27,37 @@ digraph G {
     >]
  
    webrequest_log_line         [label="Receive request from the mobile pageview decision tree\n (https://github.com/wikimedia/metrics/blob/master/pageviews/kraken/pageview_definition.png)",style=filled,color="CornflowerBlue"];
-   decision_is_zero_traffic    [label="Request comes from a Wikipedia Zero carrier ip4/ip6 cidr range\n (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
-   decision_is_opera           [label="Wikipedia Zero config is OPERA", style=filled, color="Gold"];
-   //decision_is_test          [label="Wikipedia Zero config is TEST", style=filled, color="Gold"];
-   process_xff                 [label="Replace ip4/ip6 addresss with left-most address from XFF field", style=filled, color="Gold"];
+   decision_is_zero_traffic    [label="Request comes from a Wikipedia Zero *carrier* ip4/ip6 cidr range\n (https://meta.wikimedia.org/w/index.php?title=Special%3APrefixIndex&prefix=&namespace=480)", style=filled, color="Gold"];
+   decision_is_opera           [label="Wikipedia Zero config is OPERA (https://meta.wikimedia.org/wiki/Zero:-OPERA)", style=filled, color="Gold"];
+   decision_is_test            [label="Wikipedia Zero config is TEST (https://meta.wikimedia.org/wiki/Zero:-TEST)", style=filled, color="Gold"];
+   decision_is_zero_bdd        [label="PhantomJS Internal Request 10.4.1.118", style=filled, color="Gold"];
+   process_xff                 [label="Use ip4/ip6 addresss from right-most address from XFF field", style=filled, color="Gold"];
+   decision_was_it_opera       [label="Was it an Opera-based hit?", style=filled, color="Gold"];
+   decision_is_qualified_opera [label="Carrier zero rates Opera", style=filled, color="Gold"];
 
    discard                     [label="Log line should not count towards the Zero pageview metric", style=filled, color="Red"];
-   count                       [label="Log line should be counted towards the Zero pageview metric", style=filled, color="Green"];
+   count                       [label="Log line should be counted towards the Zero pageview metric without Opera zero-rating", style=filled, color="Green"];
+   count_opera_hit_free        [label="Log line should be counted towards the Zero pageview metric with Opera zero-rating", style=filled, color="Green"];
+   count_opera_opportunity     [label="Log line should be counted towards a the non-free Opera hit metric", style=filled, color="Red"];
 
-  webrequest_log_line          -> decision_is_zero_traffic;
+   webrequest_log_line          -> decision_is_opera            [ label="client.ip in Zero:-OPERA.ips" ]
+   webrequest_log_line          -> decision_is_test             [ label="client.ip in Zero:-TEST.ips" ]
+   webrequest_log_line          -> decision_is_zero_bdd         [ label="client.ip is 10.4.1.118" ]
+   webrequest_log_line          -> decision_is_zero_traffic     [ label="Everything else" ]
 
-  decision_is_zero_traffic     -> decision_is_opera            [ label="yes" ]; 
-  decision_is_zero_traffic     -> discard                      [ label="no" ];
+   decision_is_opera            -> process_xff                  [ label="examine XFF" ];
 
-  decision_is_opera            -> process_xff                  [ label="yes" ];
-  decision_is_opera            -> count                        [ label="no" ];
+   decision_is_test             -> discard                      [ label="testing IP" ]
+   decision_is_zero_bdd         -> discard                      [ label="internal IP" ]
 
-  process_xff                  -> count                        [ label="yes" ];
-  
+   process_xff                  -> decision_is_zero_traffic     [ label="true IP" ];
+
+   decision_is_zero_traffic     -> decision_was_it_opera        [ label="yes" ];
+   decision_is_zero_traffic     -> discard                      [ label="no" ];
+
+   decision_was_it_opera        -> decision_is_qualified_opera  [ label="yes" ];
+   decision_was_it_opera        -> count                        [ label="no" ];
+
+   decision_is_qualified_opera  -> count_opera_hit_free         [ label="yes" ];
+   decision_is_qualified_opera  -> count_opera_opportunity      [ label="no" ];
 };
