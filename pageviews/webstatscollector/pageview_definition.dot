@@ -1,8 +1,9 @@
 /*
    You can convert this graph to a PNG image with this command:
 
-   dot -Tpng  pageview_definition.dot  -o pageview_definition.png
+     dot -Tpng  pageview_definition.dot  -o pageview_definition.png
 
+   (or you can just use the Makefile)
 */
 
 
