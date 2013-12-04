@@ -1,7 +1,7 @@
 /*
    You can convert this graph to a PNG image with this command:
 
-   dot -Tpng  Pageview_definition.dot  -o Pageview_definition.png
+   dot -Tpng  pageview_definition.dot  -o pageview_definition.png
 
 */
 
