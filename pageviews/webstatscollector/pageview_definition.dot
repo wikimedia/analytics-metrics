@@ -32,7 +32,7 @@ digraph G {
    decision_internal_traffic    [label="request comes from internal WMF IP address", style=filled, color="Gold"];
    decision_org_domain          [label="domain ends in .org", style=filled, color="Gold"];
    decision_has_path            [label="url has path", style=filled, color="Gold"];
-   decision_has_wiki            [label="path contains 'wiki'", style=filled, color="Gold"];
+   decision_has_wiki            [label="path starts in '/wiki'", style=filled, color="Gold"];
    decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
    decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
    decision_sub_project         [label=< 
