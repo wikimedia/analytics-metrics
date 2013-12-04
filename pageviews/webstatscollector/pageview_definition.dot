@@ -1,4 +1,4 @@
-/* 
+/*
    You can convert this graph to a PNG image with this command:
 
    dot -Tpng  Pageview_definition.dot  -o Pageview_definition.png
@@ -26,9 +26,9 @@ digraph G {
       </TR>
      </TABLE>
     >]
- 
+
    Squid_log_line               [label="Get a cache log line",style=filled,color="CornflowerBlue"];
-   
+
    decision_internal_traffic    [label="request comes from internal WMF IP address", style=filled, color="Gold"];
    decision_org_domain          [label="domain ends in .org", style=filled, color="Gold"];
    decision_has_path            [label="url has path", style=filled, color="Gold"];
@@ -38,7 +38,7 @@ digraph G {
    decision_no_redirect         [label="HTTP status code is in [301, 302, 303]", style=filled, color="Gold"];
    decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
    decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
-   decision_sub_project         [label=< 
+   decision_sub_project         [label=<
      <table>
      <tr><td colspan="2">is one of:</td></tr>
      <tr><td>commons   </td> <td>meta     </td> </tr>
@@ -59,7 +59,7 @@ digraph G {
      </table>
      >, style=filled,color="Gold"];
 
-   
+
    discard              [label="Log line does not count as a pageview", style=filled, color="Red"];
    Actual_pageview      [label="We have a pageview", style=filled, color="Green"];
 
@@ -98,5 +98,5 @@ digraph G {
 
    decision_sub_project         -> Actual_pageview              [ label="yes"];
    decision_sub_project         -> discard                      [ label="no"];
-   
+
 };
