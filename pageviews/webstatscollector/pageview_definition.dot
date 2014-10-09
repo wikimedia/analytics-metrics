@@ -35,6 +35,7 @@ digraph G {
    decision_has_wiki            [label="path starts in '/wiki'", style=filled, color="Gold"];
    decision_centralautologin    [label="path starts in '/wiki/Special:CentralAutoLogin/'", style=filled, color="Gold"];
    decision_undefined           [label="path is either '/wiki/undefined' or '/wiki/Undefined'", style=filled, color="Gold"];
+   decision_no_redirect         [label="HTTP status code is in [301, 302, 303]", style=filled, color="Gold"];
    decision_has_language_n_proj [label="url has language and project", style=filled, color="Gold"];
    decision_wikimedia_project   [label="is wikimedia project", style=filled, color="Gold"];
    decision_sub_project         [label=< 
@@ -80,8 +81,11 @@ digraph G {
    decision_centralautologin    -> decision_undefined           [ label="no"];
    decision_centralautologin    -> discard                      [ label="yes"];
 
-   decision_undefined           -> decision_has_language_n_proj [ label="no"];
+   decision_undefined           -> decision_no_redirect         [ label="no"];
    decision_undefined           -> discard                      [ label="yes"];
+
+   decision_no_redirect         -> decision_has_language_n_proj [ label="no"];
+   decision_no_redirect         -> discard                      [ label="yes"];
 
    decision_has_language_n_proj -> decision_wikimedia_project   [ label="yes"];
    decision_has_language_n_proj -> discard                      [ label="no"];
